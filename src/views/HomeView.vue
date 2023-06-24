@@ -96,45 +96,95 @@
             v-model="newProp" @keyup.enter="addProp" />
 
 
-
-
-          <div v-if="currentProp != null">
-            {{ currentProp }}
-            <div>
-              <b-button @click="edit" variant="outline" title="edit">
-                <RiPencilLine width="20" height="20" fill="rgba(0,0,250,1)" />
-              </b-button>
-
-              <b-button @click="paste(null)" variant="outline" title="paste">
-                <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
-              </b-button>
-              <b-button @click="openPaste = true" variant="outline" title="paste">
-                <RiAttachmentLine width="20" height="20" fill="rgba(0,0,250,1)" />
-              </b-button>
-
-              <b-button @click="link" variant="outline" title="link">
-                <RiLink width="20" height="20" fill="rgba(0,0,250,1)" />
-              </b-button>
-
-
-            </div>
-            <div v-if="textAreaShow">
-              <b-form-textarea v-model="textAreaValue" placeholder="Enter a text value..." rows="3"
-                max-rows="6"></b-form-textarea>
-              <b-button @click="saveTextArea" variant="outline" title="link">
-                <RiSave3Fill width="32" height="32" fill="rgba(0,250,0,1)" />
-              </b-button>
-            </div>
-          </div>
-
-
-
-
           <div class="scroll">
             <b-card>
               <div id="my-accordion" class="accordion" role="tablist">
+                <b-card no-body class="mb-1" v-for="p in currentPropertiesSorted" :key="p[0]">
+                  <!-- {{ p[0] }} / {{ p[1] }} -->
 
-                <b-card no-body class="mb-1" v-for="p in currentPropertiesSorted" :key="p">
+                  <b-card-header header-tag="header" class="p-1 d-grid gap-2" role="tab">
+                    <b-button @click="currentProp == p[0] ? currentProp = null : currentProp = p[0] " variant="info">
+
+                      {{ p[0] }} ,
+                      {{ since(current.properties[p[0]].lastEdit) }} / ({{ current.properties[p[0]].values.length }})
+                      values
+                      /
+
+                      <!-- <b-button @click.stop="currentProp = p[0] ? currentProp = null : currentProp = p[0] " variant="outline" title="edit">
+                        <RiPencilLine width="32" height="22" fill="rgba(0,0,250,1)" />
+                      </b-button> -->
+                    </b-button>
+                  </b-card-header>
+
+                  <b-collapse :visible="currentProp == p[0]" accordion="my-accordion" role="tabpanel">
+
+                    <div>
+                      <b-button @click="edit" variant="outline" title="edit">
+                        <RiPencilLine width="20" height="20" fill="rgba(0,0,250,1)" />
+                      </b-button>
+
+                      <b-button @click="paste(null)" variant="outline" title="paste">
+                        <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
+                      </b-button>
+                      <b-button @click="openPaste = true" variant="outline" title="paste">
+                        <RiAttachmentLine width="20" height="20" fill="rgba(0,0,250,1)" />
+                      </b-button>
+
+                      <b-button @click="link" variant="outline" title="link">
+                        <RiLink width="20" height="20" fill="rgba(0,0,250,1)" />
+                      </b-button>
+
+
+                    </div>
+                    <div v-if="textAreaShow">
+                      <b-form-textarea v-model="textAreaValue" placeholder="Enter a text value..." rows="3"
+                        max-rows="6"></b-form-textarea>
+                      <b-button @click="saveTextArea" variant="outline" title="link">
+                        <RiSave3Fill width="32" height="32" fill="rgba(0,250,0,1)" />
+                      </b-button>
+                    </div>
+
+
+                    <b-list-group-item 
+                      v-for="v in Array.from(current.properties[p[0]].values).sort((a, b) => b.lastEdit - a.lastEdit) "
+                      :key="v.id">
+
+                      <div v-if="v.id != undefined">
+
+                        <!-- node {{ v }} -->
+                        <b-button @click.stop="switchTo(v.id)" variant="outline-success" title="switch to">
+                          {{ v.name }}
+                        </b-button>
+
+
+                      </div>
+                      <div v-else-if="v.type == 'http://www.w3.org/2001/XMLSchema#string'">
+                        {{ v.value }}
+                      </div>
+                      <div v-else>
+                        {{ v }}
+                      </div>
+
+
+                      {{ since(v.lastEdit) }}
+                      <hr>
+                    </b-list-group-item>
+
+
+
+
+
+
+
+
+                  </b-collapse>
+
+
+
+
+                </b-card>
+
+                <!-- <b-card no-body class="mb-1" v-for="p in currentPropertiesSorted" :key="p">
                   <b-card-header header-tag="header" class="p-1 d-grid gap-2" role="tab">
                     <b-button v-b-toggle="'collapse-' + p" variant="info">
                       {{ p }} , {{ since(current.properties[p].lastEdit) }} / ({{ current.properties[p].values.length }})
@@ -151,31 +201,13 @@
                     <b-card-body>
 
 
-                      <b-list-group-item button @click.stop="clickValue(v)" v-for="v in current.properties[p].values "
-                        :key="v.id">
-                        <div v-if="v.id != undefined">
-
-                          node {{ v }}
-
-
-                        </div>
-                        <div v-else-if="v.type == 'http://www.w3.org/2001/XMLSchema#string'">
-                          text {{ v }}
-                        </div>
-                        <div v-else>
-                          {{ v }}
-                        </div>
-
-
-
-                        <hr>
-                      </b-list-group-item>
+                      
 
 
                     </b-card-body>
                   </b-collapse>
                 </b-card>
-
+              -->
 
               </div>
             </b-card>
@@ -348,7 +380,6 @@ export default {
       this.newTodo = "";
       this.toasting({ title: "created", body: todo.name })
     },
-
     addProp() {
       if (this.newProp.trim().length == 0) return
       console.log(this.newProp)
@@ -366,6 +397,9 @@ export default {
       t.lastEdit = Date.now()
       this.current = t
       this.toasting({ title: "current", body: t.name })
+    },
+    switchTo(id) {
+      console.log(id)
     },
     copy(t) {
 
@@ -462,7 +496,7 @@ export default {
   },
   computed: {
     currentPropertiesSorted: function () {
-      return this.current.properties == undefined ? [] : Object.keys(this.current.properties).sort((a, b) => b.lastEdit - a.lastEdit);
+      return this.current.properties == undefined ? [] : Object.entries(this.current.properties).sort((a, b) => b[1].lastEdit - a[1].lastEdit);
     }
   }
 };
