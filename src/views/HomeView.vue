@@ -1,5 +1,9 @@
 <template>
   <main id="app">
+
+    <b-toast ref="toast" toastClass="toast" v-model="toast.show" :title="toast.title" :body="toast.body"
+      :variant="toast.variant">
+    </b-toast>
     <h1>Todo Vue
       <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24">
         <path
@@ -40,8 +44,12 @@
             <b-button-group class="mx-1">
               <b-button @click="copy(current)" variant="outiline">
                 <RiClipboardLine width="20" height="20" fill="rgba(0,0,250,1)" />
+
               </b-button>
 
+              <b-button @click="fork(current)" variant="outiline">
+                <RiGitBranchLine width="20" height="20" fill="rgba(0,0,250,1)" />
+              </b-button>
               <!-- <b-button>&laquo;</b-button>
               <b-button>&lsaquo;</b-button> -->
             </b-button-group>
@@ -59,9 +67,9 @@
 
 
 
-            <b-button-group class="mx-5">
+            <b-button-group class="mx-1">
               <b-button size="sm" variant="outline-danger" @click.stop="removeTodo(current)">
-                <RiDeleteBinLine width="20" height="20" fill="rgba(250,0,0,1)" />
+                <RiDeleteBinLine width="10" height="10" fill="rgba(250,0,0,1)" />
               </b-button>
             </b-button-group>
 
@@ -96,10 +104,6 @@
 
 
 
-
-
-
-
         <b-col md="6">
 
           <!-- LIST -->
@@ -124,7 +128,7 @@
                       v-if="listMode == 'expanded'" />
                     {{ todo.name }}
                   </b-col>
-
+                  <b-col> <small>{{ since(todo.lastEdit) }}</small></b-col>
                   <b-col v-if="listMode == 'expanded'">
                     <!-- {{ todo }} -->
                     <div v-if="todo.privacy == 'public'">
@@ -137,17 +141,18 @@
 
                   </b-col>
                 </b-row>
-                <b-row v-if="listMode == 'expanded'"> <small>{{ since(todo.lastEdit) }}</small></b-row>
+
               </b-list-group-item>
             </div>
           </b-list-group>
         </b-col>
       </b-row>
+
     </b-container>
 
-    <b-toast variant="info" ref="toast" v-model="toast.show" :title="toast.title" :body="toast.body">
 
-    </b-toast>
+
+
   </main>
 </template>
 
@@ -158,7 +163,7 @@ import { store } from "@/y_store";
 import { context } from "@/context";
 import * as Vue from "vue";
 import { enableVueBindings, observeDeep } from "@syncedstore/core";
-import { RiLockUnlockLine, RiLock2Line, RiClipboardLine, RiDeleteBinLine, RiCloseCircleLine, RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink } from "vue-remix-icons"
+import { RiLockUnlockLine, RiLock2Line, RiClipboardLine, RiDeleteBinLine, RiCloseCircleLine, RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink, RiGitBranchLine } from "vue-remix-icons"
 
 
 // make SyncedStore use Vuejs internally
@@ -167,7 +172,7 @@ enableVueBindings(Vue);
 export default {
   name: "HomeView",
   components: {
-    RiLockUnlockLine, RiLock2Line, RiClipboardLine, RiDeleteBinLine, RiCloseCircleLine, RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink
+    RiLockUnlockLine, RiLock2Line, RiClipboardLine, RiDeleteBinLine, RiCloseCircleLine, RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink, RiGitBranchLine
   },
   data() {
     return {
@@ -202,10 +207,12 @@ export default {
       this.store.todos.push(todo);
       this.expand(todo)
       this.newTodo = "";
+      this.toasting({ title: "created", body: todo.name })
     },
     setCurrent(t) {
       t.lastEdit = Date.now()
       this.current = t
+      this.toasting({ title: "current", body: t.name })
     },
     copy(t) {
       console.log(t)
@@ -215,9 +222,17 @@ export default {
         window.clipboardData.setData('Text', t.id);
       }
 
-      this.toast.title = t.name + " copied" // en gras
-      // this.toast.body = t.name + " copied" // en normal
+      this.toasting({ title: "copied", body: t.name, variant: "info" })
+    },
+    toasting(data) {
+      this.toast.variant = data.variant || "info"
+      this.toast.title = data.title
+      this.toast.body = data.body
       this.toast.show = true
+    },
+    fork(t) {
+      console.log("forking", t)
+      this.toasting({ title: "forked", body: t.name })
     },
     async expand(t) {
       const expanded = await jsonld.expand(t);
@@ -278,6 +293,12 @@ li button {
   background-color: lightblue;
   height: 650px;
   overflow-y: scroll;
+}
+
+.toast {
+  position: absolute;
+  bottom: 0px;
+  left: 200px;
 }
 </style>
 
