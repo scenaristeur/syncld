@@ -1,18 +1,12 @@
-import { createStore } from 'vuex'
-import * as Vue from "vue";
-import { enableVueBindings } from "@syncedstore/core";
-
-enableVueBindings(Vue);
+import { createStore } from "vuex";
+import core from './modules/core'
 
 export default createStore({
-  state: {
-  },
-  getters: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
+  state: {},
+  getters: {},
+  mutations: {},
+  actions: {},
   modules: {
-  }
-})
+    core,
+  },
+});

@@ -1,4 +1,4 @@
-import { syncedStore, getYjsDoc } from "@syncedstore/core";
+import { syncedStore, getYjsDoc /*, observeDeep*/ } from "@syncedstore/core";
 import { WebrtcProvider } from "y-webrtc";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebsocketProvider } from "y-websocket";
@@ -8,7 +8,13 @@ import { Awareness } from "y-protocols/awareness";
 // type Todo = { completed: boolean, title: string };
 
 // Create your SyncedStore store
-export const store = syncedStore({ brains: [], neurones: [], todos: [] });
+const shape = {
+  brains: [],
+  neurones: [],
+  todos: [],
+};
+export const store = syncedStore(shape);
+// export const observe = observeDeep()
 
 // Create a document that syncs automatically using Y-WebRTC
 const doc = getYjsDoc(store);

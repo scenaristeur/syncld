@@ -1,5 +1,26 @@
 # syncld
 
+
+
+## shape 
+- https://syncedstore.org/docs/basics/installation#syncedstore-method
+exeample const shape = {
+  exampleArrayData: [],
+  exampleObjectData: {},
+  exampleXMLData: "xml",
+  exampleTextData: "text",
+};
+
+const shape = {
+  brains: [],
+  neurones: [],
+  todos: [],
+};
+const store = syncedStore(shape);
+
+
+
+
 ## Project setup
 ```
 npm install
