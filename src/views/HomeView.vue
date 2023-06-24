@@ -1,18 +1,74 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <main id="app">
+    <h1>Todo Vue</h1>
+    <input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?" v-model="newTodo"
+      @keyup.enter="addTodo" />
+    <ul class="todo-list">
+      <li v-for="todo in store.todos" class="todo" :key="todo.title">
+        <div class="view">
+          <label>
+            <input class="toggle" type="checkbox" v-model="todo.completed" />
+            {{ todo.title }}
+          </label>
+          <button class="destroy" @click="removeTodo(todo)">Delete</button>
+        </div>
+      </li>
+    </ul>
+  </main>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import { store } from "@/y_store";
+import * as Vue from "vue";
+import { enableVueBindings } from "@syncedstore/core";
+
+// make SyncedStore use Vuejs internally
+enableVueBindings(Vue);
 
 export default {
-  name: 'HomeView',
-  components: {
-    HelloWorld
+  name: "HomeView",
+  data() {
+    return {
+      store, // Put the store on the data() of the component
+      newTodo: ""
+    };
+  },
+  methods: {
+    addTodo() {
+      const value = this.newTodo && this.newTodo.trim();
+      if (!value) {
+        return;
+      }
+      this.store.todos.push({
+        title: value,
+        completed: false,
+      });
+      this.newTodo = "";
+    },
+    removeTodo(todo) {
+      this.store.todos.splice(this.store.todos.indexOf(todo), 1);
+    }
   }
-}
+};
 </script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+ul {
+  text-align: left;
+}
+
+li button {
+  margin-left: 1em;
+}
+</style>
+
+
+
