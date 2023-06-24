@@ -43,3 +43,10 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+### stack 
+- yjs
+- syncedstore
+- jsonld
+- bootstrap https://bootstrap-vue-next.github.io/bootstrap-vue-next/docs.html
