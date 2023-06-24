@@ -103,7 +103,7 @@
                   <!-- {{ p[0] }} / {{ p[1] }} -->
 
                   <b-card-header header-tag="header" class="p-1 d-grid gap-2" role="tab">
-                    <b-button @click="currentProp == p[0] ? currentProp = null : currentProp = p[0] " variant="info">
+                    <b-button @click="currentProp == p[0] ? currentProp = null : currentProp = p[0]" variant="info">
 
                       {{ p[0] }} ,
                       {{ since(current.properties[p[0]].lastEdit) }} / ({{ current.properties[p[0]].values.length }})
@@ -123,12 +123,14 @@
                         <RiPencilLine width="20" height="20" fill="rgba(0,0,250,1)" />
                       </b-button>
 
+                      <span v-if="clipboard.length > 0">
                       <b-button @click="paste(null)" variant="outline" title="paste">
                         <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
                       </b-button>
                       <b-button @click="openPaste = true" variant="outline" title="paste">
                         <RiAttachmentLine width="20" height="20" fill="rgba(0,0,250,1)" />
                       </b-button>
+                      </span>
 
                       <b-button @click="link" variant="outline" title="link">
                         <RiLink width="20" height="20" fill="rgba(0,0,250,1)" />
@@ -145,7 +147,7 @@
                     </div>
 
 
-                    <b-list-group-item 
+                    <b-list-group-item
                       v-for="v in Array.from(current.properties[p[0]].values).sort((a, b) => b.lastEdit - a.lastEdit) "
                       :key="v.id">
 
@@ -400,6 +402,11 @@ export default {
     },
     switchTo(id) {
       console.log(id)
+      let current = this.store.todos.find(x => x.id == id)
+      console.log(current.name)
+      this.setCurrent(current)
+
+
     },
     copy(t) {
 
