@@ -1,7 +1,7 @@
 <template>
   <main id="app">
 
-    <b-toast ref="toast" toastClass="toast" v-model="toast.show" :title="toast.title" :body="toast.body"
+    <b-toast ref="toast" :toastClass="toastClass" v-model="toast.show" :title="toast.title" :body="toast.body"
       :variant="toast.variant">
     </b-toast>
     <h1>Todo Vue
@@ -84,22 +84,92 @@
           <b-form-textarea v-model="current.proposition" placeholder="proposition..." rows="3"
             max-rows="6"></b-form-textarea>
 
-          <b-button @click="paste" variant="outline">
+          <b-button @click="addPropShow = true" variant="outline" v-if="addPropShow != true">
             <RiAddCircleFill width="20" height="20" fill="rgba(0,0,250,1)" />
           </b-button>
 
-          <b-button @click="paste" variant="outline">
-            <RiPencilLine width="20" height="20" fill="rgba(0,0,250,1)" />
-          </b-button>
 
-          <b-button @click="paste" variant="outline">
-            <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
-          </b-button>
-          <b-button @click="paste" variant="outline">
-            <RiLink width="20" height="20" fill="rgba(0,0,250,1)" />
-          </b-button>
+
+
+
+          <b-form-input v-if="addPropShow == true" autofocus autocomplete="off" placeholder="add a prop..."
+            v-model="newProp" @keyup.enter="addProp" />
+
+
+
+
+          <div v-if="currentProp != null">
+            {{ currentProp }}
+            <div>
+              <b-button @click="edit" variant="outline" title="edit">
+                <RiPencilLine width="20" height="20" fill="rgba(0,0,250,1)" />
+              </b-button>
+
+              <b-button @click="paste(null)" variant="outline" title="paste">
+                <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
+              </b-button>
+              <b-button @click="openPaste = true" variant="outline" title="paste">
+                <RiAttachmentLine width="20" height="20" fill="rgba(0,0,250,1)" />
+              </b-button>
+
+              <b-button @click="link" variant="outline" title="link">
+                <RiLink width="20" height="20" fill="rgba(0,0,250,1)" />
+              </b-button>
+
+
+            </div>
+            <div v-if="textAreaShow">
+              <b-form-textarea v-model="textAreaValue" placeholder="Enter a text value..." rows="3"
+                max-rows="6"></b-form-textarea>
+              <b-button @click="saveTextArea" variant="outline" title="link">
+                <RiSave3Fill width="32" height="32" fill="rgba(0,250,0,1)" />
+              </b-button>
+            </div>
+          </div>
+
+
+
+
+
+
+          <b-list-group>
+            {{ currentPropertiesSorted }}
+            <div class="scroll">
+              <b-list-group-item button @click="this.currentProp = p" v-for="p in currentPropertiesSorted" :key="p">
+                <b-row>
+                  <b-col> {{ p }} <br> {{ since(current.properties[p].lastEdit) }}</b-col>
+                  <b-col>
+                    <b-list-group-item button @click.stop v-for="v in current.properties[p].values " :key="v.id">
+                      {{ v }}
+                    </b-list-group-item>
+                  </b-col>
+                </b-row>
+
+
+
+
+              </b-list-group-item>
+
+            </div>
+          </b-list-group>
+
+
+          <hr>
+          <hr>
+          {{ current.properties }}
+          <hr>
+
+
           <br>
           {{ current }}
+
+          <b-modal v-model="openPaste" title="clipboard">
+            <b-button disabled>Paste all</b-button> <b-button disabled>clear</b-button>
+            <b-list-group>
+              <b-list-group-item button v-for="c of clipboard" :key="c.id" @click="paste(c)">{{ c.name }}, {{ c.id
+              }}</b-list-group-item>
+            </b-list-group>
+          </b-modal>
         </b-col>
 
 
@@ -113,12 +183,12 @@
               @click="listMode == 'stretched' ? listMode = 'expanded' : listMode = 'stretched'">{{ listMode }}</b-button>
             <div class="scroll">
               <b-list-group-item button
-                v-for="todo in Array.from(store.todos).sort((t1, t2) => t2.lastEdit - t1.lastEdit)" class="todo"
-                :key="todo.id" @click="setCurrent(todo)">
+                v-for="todo in Array.from(store.todos).sort((t1, t2) => t2.lastEdit - t1.lastEdit)" :key="todo.id"
+                @click="setCurrent(todo)">
 
                 <b-row>
                   <b-col>
-                    <b-button @click.stop="copy(todo)" variant="outiline" :size="sm">
+                    <b-button @click.stop="copy(todo)" variant="outiline" size="sm">
                       <RiClipboardLine width="20" height="20" fill="rgba(0,0,250,1)" />
                     </b-button>
                   </b-col>
@@ -163,7 +233,12 @@ import { store } from "@/y_store";
 import { context } from "@/context";
 import * as Vue from "vue";
 import { enableVueBindings, observeDeep } from "@syncedstore/core";
-import { RiLockUnlockLine, RiLock2Line, RiClipboardLine, RiDeleteBinLine, RiCloseCircleLine, RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink, RiGitBranchLine } from "vue-remix-icons"
+import {
+  RiLockUnlockLine, RiLock2Line,
+  RiClipboardLine, RiDeleteBinLine, RiCloseCircleLine,
+  RiAttachmentLine, RiAttachment2, RiPencilLine,
+  RiAddCircleFill, RiLink, RiGitBranchLine, RiSave3Fill
+} from "vue-remix-icons"
 
 
 // make SyncedStore use Vuejs internally
@@ -172,7 +247,10 @@ enableVueBindings(Vue);
 export default {
   name: "HomeView",
   components: {
-    RiLockUnlockLine, RiLock2Line, RiClipboardLine, RiDeleteBinLine, RiCloseCircleLine, RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink, RiGitBranchLine
+    RiLockUnlockLine, RiLock2Line, RiClipboardLine,
+    RiDeleteBinLine, RiCloseCircleLine, RiAttachmentLine,
+    RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink, RiGitBranchLine,
+    RiSave3Fill
   },
   data() {
     return {
@@ -181,7 +259,15 @@ export default {
       privacy: true, // public or not
       current: null,
       toast: {},
-      listMode: 'stretched'
+      listMode: 'stretched',
+      newProp: "",
+      toastClass: ['toast'],
+      addPropShow: false,
+      currentProp: null,
+      clipboard: [],
+      openPaste: false,
+      textAreaShow: false,
+      textAreaValue: ""
     };
   },
   mounted() {
@@ -209,20 +295,67 @@ export default {
       this.newTodo = "";
       this.toasting({ title: "created", body: todo.name })
     },
+
+    addProp() {
+      if (this.newProp.trim().length == 0) return
+      console.log(this.newProp)
+      this.current.properties == undefined ? this.current.properties = {} : ""
+      this.currentProp = this.newProp
+      this.current.properties[this.currentProp] == undefined ? this.current.properties[this.currentProp] = { lastEdit: Date.now(), values: [] } : ""
+
+      this.newProp = ""
+      this.addPropShow = false
+      this.textAreaShow = false
+    },
     setCurrent(t) {
+      this.textAreaShow = false,
+        this.textAreaValue = ""
       t.lastEdit = Date.now()
       this.current = t
       this.toasting({ title: "current", body: t.name })
     },
     copy(t) {
-      console.log(t)
+
       if (navigator.clipboard) { // default: modern asynchronous API
         navigator.clipboard.writeText(t.id);
       } else if (window.clipboardData && window.clipboardData.setData) {     // for IE11
         window.clipboardData.setData('Text', t.id);
       }
+      this.clipboard.unshift({ id: t.id, name: t.name })
+      console.log("copy", t.name)
 
       this.toasting({ title: "copied", body: t.name, variant: "info" })
+    },
+    async paste(pastor) {
+      console.log(pastor)
+      console.log(this.clipboard)
+      pastor == null ? pastor = this.clipboard[0] : ""
+      console.log('paste', pastor.id, pastor.name)
+      let pasted = { id: pastor.id, name: pastor.name, comment: "not sure for the name id must be sufficient", lastEdit: Date.now() }
+      if (this.currentProp != null) {
+        this.current.properties[this.currentProp].values.push(pasted)
+      }
+    },
+    edit() {
+      console.log('edit')
+      this.textAreaShow = true
+      this.textAreaValue = ""
+    },
+    saveTextArea() {
+      console.log(this.textAreaValue)
+      let v = this.textAreaValue.trim()
+      if (this.currentProp != null && v.length > 0) {
+        let value = {
+          "@value": v,
+          "@type": "http://www.w3.org/2001/XMLSchema#string"
+        }
+        this.current.properties[this.currentProp].values.push(value)
+      }
+      this.newProp = ""
+      this.textAreaShow = false
+    },
+    link() {
+      console.log('link should open multi source, google / duckduck / dbpedia / solid /AV....')
     },
     toasting(data) {
       this.toast.variant = data.variant || "info"
@@ -268,6 +401,11 @@ export default {
       display = a > 0 ? a + 'a' : m > 0 ? m + 'm' : j > 0 ? j + 'j' : h > 0 ? h + 'h' : min > 0 ? min + 'min' : s + 's'
       return display//hDisplay + mDisplay + sDisplay;
     },
+  },
+  computed: {
+    currentPropertiesSorted: function () {
+      return this.current.properties == undefined ? [] : Object.keys(this.current.properties).sort((a, b) => b.lastEdit - a.lastEdit);
+    }
   }
 };
 </script>
