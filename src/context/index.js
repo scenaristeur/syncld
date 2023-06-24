@@ -4,5 +4,6 @@ export const context = {
     "no": "https://scenaristeur.github.io/noosphere#",
     "id": "@id",
     "type": "@type",
+    "value": "@value",
     "base": "https://scenaristeur.github.io/noosphere#"
   }

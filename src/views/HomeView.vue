@@ -130,9 +130,58 @@
 
 
 
+          <div class="scroll">
+            <b-card>
+              <div id="my-accordion" class="accordion" role="tablist">
+
+                <b-card no-body class="mb-1" v-for="p in currentPropertiesSorted" :key="p">
+                  <b-card-header header-tag="header" class="p-1 d-grid gap-2" role="tab">
+                    <b-button v-b-toggle="'collapse-' + p" variant="info">
+                      {{ p }} , {{ since(current.properties[p].lastEdit) }} / ({{ current.properties[p].values.length }})
+                      values
+                      /
+                      <b-button @click.stop="this.currentProp = p" variant="outline" title="edit">
+                        <RiPencilLine width="32" height="22" fill="rgba(0,0,250,1)" />
+                      </b-button>
 
 
-          <b-list-group>
+                    </b-button>
+                  </b-card-header>
+                  <b-collapse :id="'collapse-' + p" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+
+
+                      <b-list-group-item button @click.stop="clickValue(v)" v-for="v in current.properties[p].values "
+                        :key="v.id">
+                        <div v-if="v.id != undefined">
+
+                          node {{ v }}
+
+
+                        </div>
+                        <div v-else-if="v.type == 'http://www.w3.org/2001/XMLSchema#string'">
+                          text {{ v }}
+                        </div>
+                        <div v-else>
+                          {{ v }}
+                        </div>
+
+
+
+                        <hr>
+                      </b-list-group-item>
+
+
+                    </b-card-body>
+                  </b-collapse>
+                </b-card>
+
+
+              </div>
+            </b-card>
+          </div>
+
+          <!-- <b-list-group>
             {{ currentPropertiesSorted }}
             <div class="scroll">
               <b-list-group-item button @click="this.currentProp = p" v-for="p in currentPropertiesSorted" :key="p">
@@ -151,17 +200,17 @@
               </b-list-group-item>
 
             </div>
-          </b-list-group>
+          </b-list-group> -->
 
 
-          <hr>
+          <!-- <hr>
           <hr>
           {{ current.properties }}
           <hr>
 
 
           <br>
-          {{ current }}
+          {{ current }} -->
 
           <b-modal v-model="openPaste" title="clipboard">
             <b-button disabled>Paste all</b-button> <b-button disabled>clear</b-button>
@@ -240,12 +289,16 @@ import {
   RiAddCircleFill, RiLink, RiGitBranchLine, RiSave3Fill
 } from "vue-remix-icons"
 
+import { vBToggle } from 'bootstrap-vue-3';
 
 // make SyncedStore use Vuejs internally
 enableVueBindings(Vue);
 
 export default {
   name: "HomeView",
+  directives: {
+    'b-toggle': vBToggle
+  },
   components: {
     RiLockUnlockLine, RiLock2Line, RiClipboardLine,
     RiDeleteBinLine, RiCloseCircleLine, RiAttachmentLine,
@@ -267,7 +320,7 @@ export default {
       clipboard: [],
       openPaste: false,
       textAreaShow: false,
-      textAreaValue: ""
+      textAreaValue: "",
     };
   },
   mounted() {
@@ -346,10 +399,12 @@ export default {
       let v = this.textAreaValue.trim()
       if (this.currentProp != null && v.length > 0) {
         let value = {
-          "@value": v,
-          "@type": "http://www.w3.org/2001/XMLSchema#string"
+          "value": v,
+          "type": "http://www.w3.org/2001/XMLSchema#string",
+          lastEdit: Date.now()
         }
         this.current.properties[this.currentProp].values.push(value)
+        this.current.properties[this.currentProp].lastEdit = Date.now()
       }
       this.newProp = ""
       this.textAreaShow = false
@@ -362,6 +417,9 @@ export default {
       this.toast.title = data.title
       this.toast.body = data.body
       this.toast.show = true
+    },
+    clickValue(v) {
+      console.log(v)
     },
     fork(t) {
       console.log("forking", t)
@@ -429,7 +487,7 @@ li button {
 
 .scroll {
   background-color: lightblue;
-  height: 650px;
+  max-height: 650px;
   overflow-y: scroll;
 }
 
