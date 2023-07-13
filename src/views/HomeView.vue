@@ -1,9 +1,8 @@
 <template>
   <main id="app">
 
-    <b-toast ref="toast" :toastClass="toastClass" v-model="toast.show" :title="toast.title" :body="toast.body"
-      :variant="toast.variant">
-    </b-toast>
+  
+    <ToastComponent />
     <h1>Todo Vue
       <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24">
         <path
@@ -124,12 +123,12 @@
                       </b-button>
 
                       <span v-if="clipboard.length > 0">
-                      <b-button @click="paste(null)" variant="outline" title="paste">
-                        <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
-                      </b-button>
-                      <b-button @click="openPaste = true" variant="outline" title="paste">
-                        <RiAttachmentLine width="20" height="20" fill="rgba(0,0,250,1)" />
-                      </b-button>
+                        <b-button @click="paste(null)" variant="outline" title="paste">
+                          <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
+                        </b-button>
+                        <b-button @click="openPaste = true" variant="outline" title="paste">
+                          <RiAttachmentLine width="20" height="20" fill="rgba(0,0,250,1)" />
+                        </b-button>
                       </span>
 
                       <b-button @click="link" variant="outline" title="link">
@@ -266,8 +265,8 @@
               @click="listMode == 'stretched' ? listMode = 'expanded' : listMode = 'stretched'">{{ listMode }}</b-button>
             <div class="scroll">
               <b-list-group-item button
-                v-for="todo in Array.from(store.todos).sort((t1, t2) => t2.lastEdit - t1.lastEdit)" :key="todo.id"
-                @click="setCurrent(todo)">
+                v-for="todo in Array.from(ystore.todos).sort((t1, t2) => t2.lastEdit - t1.lastEdit)" :key="todo.id"
+                @click="$setCurrent(todo)">
 
                 <b-row>
                   <b-col>
@@ -303,18 +302,19 @@
 
     </b-container>
 
-
+    <GraphView />
 
 
   </main>
 </template>
 
 <script>
-import { v4 as uuidv4 } from 'uuid';
-import * as jsonld from 'jsonld';
-import { store } from "@/y_store";
-import { context } from "@/context";
+
+
+
+
 import * as Vue from "vue";
+import { ystore } from "@/y_store";
 import { enableVueBindings, observeDeep } from "@syncedstore/core";
 import {
   RiLockUnlockLine, RiLock2Line,
@@ -322,6 +322,9 @@ import {
   RiAttachmentLine, RiAttachment2, RiPencilLine,
   RiAddCircleFill, RiLink, RiGitBranchLine, RiSave3Fill
 } from "vue-remix-icons"
+
+import GraphView from "@/views/GraphView.vue";
+import ToastComponent from "@/components/ToastComponent.vue";
 
 import { vBToggle } from 'bootstrap-vue-3';
 
@@ -334,21 +337,30 @@ export default {
     'b-toggle': vBToggle
   },
   components: {
-    RiLockUnlockLine, RiLock2Line, RiClipboardLine,
-    RiDeleteBinLine, RiCloseCircleLine, RiAttachmentLine,
-    RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink, RiGitBranchLine,
-    RiSave3Fill
+    RiLockUnlockLine,
+    RiLock2Line,
+    RiClipboardLine,
+    RiDeleteBinLine,
+    RiCloseCircleLine,
+    RiAttachmentLine,
+    RiAttachment2,
+    RiPencilLine,
+    RiAddCircleFill,
+    RiLink,
+    RiGitBranchLine,
+    RiSave3Fill,
+    GraphView,
+    ToastComponent
   },
   data() {
     return {
-      store, // Put the store on the data() of the component
+      ystore, // Put the ystore on the data() of the component
       newTodo: "",
       privacy: true, // public or not
       current: null,
-      toast: {},
       listMode: 'stretched',
       newProp: "",
-      toastClass: ['toast'],
+
       addPropShow: false,
       currentProp: null,
       clipboard: [],
@@ -358,29 +370,17 @@ export default {
     };
   },
   mounted() {
-    observeDeep(this.store.todos, this.y_storeChanged)
+    observeDeep(this.ystore, this.$y_storeChanged)
   },
   methods: {
-    addTodo() {
+    async addTodo() {
       const value = this.newTodo && this.newTodo.trim();
       if (!value) {
         return;
       }
-      let todo = {
-        "@context": context,
-        id: uuidv4(),
-        type: "todo",
-        name: value,
-        completed: false,
-        privacy: this.privacy ? "public" : "private",
-        created: Date.now(),
-        lastEdit: Date.now()
-      }
-      console.log(todo)
-      this.store.todos.push(todo);
-      this.expand(todo)
+      let todo = await this.$addTodo(value)
       this.newTodo = "";
-      this.toasting({ title: "created", body: todo.name })
+      this.$store.commit('core/setToast',{ title: "created", body: todo.name })
     },
     addProp() {
       if (this.newProp.trim().length == 0) return
@@ -393,18 +393,12 @@ export default {
       this.addPropShow = false
       this.textAreaShow = false
     },
-    setCurrent(t) {
-      this.textAreaShow = false,
-        this.textAreaValue = ""
-      t.lastEdit = Date.now()
-      this.current = t
-      this.toasting({ title: "current", body: t.name })
-    },
+
     switchTo(id) {
       console.log(id)
-      let current = this.store.todos.find(x => x.id == id)
+      let current = this.ystore.todos.find(x => x.id == id)
       console.log(current.name)
-      this.setCurrent(current)
+      this.$setCurrent(current)
 
 
     },
@@ -418,7 +412,7 @@ export default {
       this.clipboard.unshift({ id: t.id, name: t.name })
       console.log("copy", t.name)
 
-      this.toasting({ title: "copied", body: t.name, variant: "info" })
+      this.$store.commit('core/setToast',{ title: "copied", body: t.name, variant: "info" })
     },
     async paste(pastor) {
       console.log(pastor)
@@ -453,30 +447,20 @@ export default {
     link() {
       console.log('link should open multi source, google / duckduck / dbpedia / solid /AV....')
     },
-    toasting(data) {
-      this.toast.variant = data.variant || "info"
-      this.toast.title = data.title
-      this.toast.body = data.body
-      this.toast.show = true
-    },
+
     clickValue(v) {
       console.log(v)
     },
     fork(t) {
       console.log("forking", t)
-      this.toasting({ title: "forked", body: t.name })
+      this.$store.commit('core/setToast',{ title: "forked", body: t.name })
     },
-    async expand(t) {
-      const expanded = await jsonld.expand(t);
-      console.log(expanded);
-      const compacted = await jsonld.compact(expanded, context);
-      console.log(JSON.stringify(compacted, null, 2));
-    },
-    y_storeChanged(changes) {
-      console.log("changes", changes)
-    },
+
+    // y_storeChanged(changes) {
+    //   console.log("changes", changes)
+    // },
     removeTodo(todo) {
-      this.store.todos.splice(this.store.todos.indexOf(todo), 1);
+      this.ystore.todos.splice(this.ystore.todos.indexOf(todo), 1);
       this.current = null
     },
     since(value) {
@@ -532,11 +516,7 @@ li button {
   overflow-y: scroll;
 }
 
-.toast {
-  position: absolute;
-  bottom: 0px;
-  left: 200px;
-}
+
 </style>
 
 

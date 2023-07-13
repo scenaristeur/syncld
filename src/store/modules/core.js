@@ -1,6 +1,7 @@
 //import * as api from "@/api/syncld";
 
 const state = () => ({
+  toaster : {}
   // current: null,
   // user: null,
   // history: [],
@@ -12,10 +13,10 @@ const mutations = {
   //   state.current = c;
   //   this.commit("core/pushToHistory", c);
   // },
-  // setUser(state, u) {
-  //   console.log(u);
-  //   state.user = u;
-  // },
+  setToast(state, t) {
+    console.log(t);
+    state.toaster = t;
+  },
   // pushToHistory(state, n) {
   //   let h = state.history;
   //   console.log("avant", h);
