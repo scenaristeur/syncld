@@ -1,7 +1,7 @@
 <template>
-        <b-toast ref="toast" :toastClass="toastClass" v-model="toast.show" :title="toast.title" :body="toast.body"
-            :variant="toast.variant">
-        </b-toast>
+    <b-toast ref="toast" :toastClass="toastClass" v-model="toast.show" :title="toast.title" :body="toast.body"
+        :variant="toast.variant">
+    </b-toast>
 </template>
 
 <script>
@@ -38,8 +38,7 @@ export default {
 <style>
 .toast {
     position: absolute;
-    bottom: 0px;
-    left: 200px;
+    top: -100px;
     z-index: 10
 }
 </style>

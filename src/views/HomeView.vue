@@ -3,14 +3,6 @@
 
 
     <ToastComponent />
-    <h1>Todo Vue
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24">
-        <path
-          d="M12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2ZM13 12H16L12 8L8 12H11V16H13V12Z">
-        </path>
-      </svg>
-
-    </h1>
 
     <b-container>
       <b-row class="my-1">
@@ -76,11 +68,11 @@
 
           name: <b-form-input autofocus autocomplete="off" placeholder="name" v-model="current.name" />
           description :
-          <b-form-textarea v-model="current.description" placeholder="description..." rows="3"
+          <b-form-textarea v-model="current.description" placeholder="Enter a description..." rows="3"
             max-rows="6"></b-form-textarea>
 
           proposition:
-          <b-form-textarea v-model="current.proposition" placeholder="proposition..." rows="3"
+          <b-form-textarea v-model="current.proposition" placeholder="Enter a proposition..." rows="3"
             max-rows="6"></b-form-textarea>
 
           <b-button @click="addPropShow = true" variant="outline" v-if="addPropShow != true">
@@ -91,7 +83,7 @@
 
 
 
-          <b-form-input v-if="addPropShow == true" autofocus autocomplete="off" placeholder="add a prop..."
+          <b-form-input v-if="addPropShow == true" autofocus autocomplete="off" placeholder="add a property..."
             v-model="newProp" @keyup.enter="addProp" />
 
 
@@ -138,8 +130,8 @@
 
                     </div>
                     <div v-if="textAreaShow">
-                      <b-form-textarea v-model="textAreaValue" placeholder="Enter a text value..." rows="3"
-                        max-rows="6"></b-form-textarea>
+                      <b-form-textarea v-model="textAreaValue" placeholder="Enter a text value for the property..."
+                        rows="3" max-rows="6"></b-form-textarea>
                       <b-button @click="saveTextArea" variant="outline" title="link">
                         <RiSave3Fill width="32" height="32" fill="rgba(0,250,0,1)" />
                       </b-button>
@@ -379,6 +371,7 @@ export default {
         return;
       }
       let todo = await this.$addTodo(value)
+      this.setCurrent(todo)
       this.newTodo = "";
       this.$store.commit('core/setToast', { title: "created", body: todo.name })
     },
@@ -423,8 +416,7 @@ export default {
       }
       this.clipboard.unshift({ id: t.id, name: t.name })
       console.log("copy", t.name)
-
-      this.$store.commit('codre/SetToast', { title: "copied", body: t.name, variant: "info" })
+      this.$store.commit('core/setToast', { title: "copied", body: t.name, variant: "info" })
     },
     async paste(pastor) {
       console.log(pastor)
