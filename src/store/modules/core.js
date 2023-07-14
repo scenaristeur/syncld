@@ -9,26 +9,21 @@ const state = () => ({
 
 const mutations = {
   setCoreCurrent(state, c) {
-    console.log(c);
     state.coreCurrent = c;
     c != null ? this.commit("core/pushToHistory", c) : "";
   },
   setToast(state, t) {
-    console.log(t);
     state.toaster = t;
   },
   pushToHistory(state, n) {
-    let h = state.history;
-    console.log("avant", h);
-    let history = state.history.filter((todo) => todo["@id"] != n["@id"]);
-    console.log("après", history);
-    history.unshift({
-      "@id": n["@id"],
-      "ve:name": n["ve:name"],
-      "ve:group": n["ve:group"],
+ 
+    let history = state.history.filter((todo) => todo["id"] != n["id"]);
+     history.unshift({
+      "id": n["id"],
+      "name": n["name"],
+      "group": n["group"],
     });
     state.history = history;
-    console.log(history);
   },
   // updateNode(n){
   //   console.log("todo find node byId and update",n)

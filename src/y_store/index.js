@@ -13,11 +13,11 @@ const shape = {
   neurones: [],
   todos: [],
 };
-export const ystore = syncedStore(shape);
+export const store = syncedStore(shape);
 // export const observe = observeDeep()
 
 // Create a document that syncs automatically using Y-WebRTC
-const doc = getYjsDoc(ystore);
+const doc = getYjsDoc(store);
 export const awareness = new Awareness(doc);
 export const webrtcProvider = new WebrtcProvider("noossync", doc, {
   awareness,

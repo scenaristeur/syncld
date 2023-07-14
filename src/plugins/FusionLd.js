@@ -35,10 +35,10 @@ export default {
         console.log(expanded);
         const compacted = await jsonld.compact(expanded, context);
         console.log(JSON.stringify(compacted, null, 2));
-      }),
+      })
 
-    (app.config.globalProperties.$y_storeChanged = (changes) => {
-      console.log("changes", changes);
-    })
+    // (app.config.globalProperties.$y_storeChanged = (changes) => {
+    //   console.log("changes", changes);
+    // })
   },
 };
