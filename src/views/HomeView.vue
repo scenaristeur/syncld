@@ -1,7 +1,7 @@
 <template>
   <main id="app">
 
-  
+
     <ToastComponent />
     <h1>Todo Vue
       <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@
               <b-button>Redo</b-button>
             </b-button-group> -->
             <b-button-group class="mx-1">
-              <b-button @click="current = null" variant="outline">
+              <b-button @click="setCurrent(null)" variant="outline">
                 <RiCloseCircleLine width="20" height="20" />
               </b-button>
             </b-button-group>
@@ -266,7 +266,7 @@
             <div class="scroll">
               <b-list-group-item button
                 v-for="todo in Array.from(ystore.todos).sort((t1, t2) => t2.lastEdit - t1.lastEdit)" :key="todo.id"
-                @click="$setCurrent(todo)">
+                @click="setCurrent(todo)">
 
                 <b-row>
                   <b-col>
@@ -380,7 +380,19 @@ export default {
       }
       let todo = await this.$addTodo(value)
       this.newTodo = "";
-      this.$store.commit('core/setToast',{ title: "created", body: todo.name })
+      this.$store.commit('core/setToast', { title: "created", body: todo.name })
+    },
+    setCurrent(t) {
+      this.textAreaShow = false
+      this.textAreaValue = ""
+
+      this.current = t
+      this.$store.commit('core/setCoreCurrent', t)
+      if (t != undefined) {
+        t.lastEdit = Date.now()
+        this.$store.commit('core/setToast', { title: "current", body: t.name })
+      }
+
     },
     addProp() {
       if (this.newProp.trim().length == 0) return
@@ -398,7 +410,7 @@ export default {
       console.log(id)
       let current = this.ystore.todos.find(x => x.id == id)
       console.log(current.name)
-      this.$setCurrent(current)
+      this.setCurrent(current)
 
 
     },
@@ -412,7 +424,7 @@ export default {
       this.clipboard.unshift({ id: t.id, name: t.name })
       console.log("copy", t.name)
 
-      this.$store.commit('core/setToast',{ title: "copied", body: t.name, variant: "info" })
+      this.$store.commit('codre/SetToast', { title: "copied", body: t.name, variant: "info" })
     },
     async paste(pastor) {
       console.log(pastor)
@@ -453,7 +465,7 @@ export default {
     },
     fork(t) {
       console.log("forking", t)
-      this.$store.commit('core/setToast',{ title: "forked", body: t.name })
+      this.$store.commit('core/setToast', { title: "forked", body: t.name })
     },
 
     // y_storeChanged(changes) {
@@ -515,8 +527,6 @@ li button {
   max-height: 650px;
   overflow-y: scroll;
 }
-
-
 </style>
 
 

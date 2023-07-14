@@ -1,6 +1,6 @@
 # syncld
 
-
+!! working on the fusion with nossld
 
 ## shape 
 - https://syncedstore.org/docs/basics/installation#syncedstore-method

@@ -39,12 +39,6 @@ export default {
 
     (app.config.globalProperties.$y_storeChanged = (changes) => {
       console.log("changes", changes);
-    }),
-      (app.config.globalProperties.$setCurrent = (t) => {
-        (this.textAreaShow = false), (this.textAreaValue = "");
-        t.lastEdit = Date.now();
-        this.current = t;
-        store.commit('core/setToast',{ title: "current", body: t.name });
-      });
+    })
   },
 };

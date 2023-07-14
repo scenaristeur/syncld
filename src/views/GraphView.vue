@@ -1,5 +1,7 @@
 <template>
     <div>
+        {{ coreCurrent }}
+        <hr>
         {{ ystore.todos }}
     </div>
 </template>
@@ -12,6 +14,11 @@ export default {
     data() {
         return {
             ystore,
+        }
+    },
+    computed: {
+        coreCurrent() {
+            return this.$store.state.core.coreCurrent
         }
     }
 

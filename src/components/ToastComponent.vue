@@ -1,9 +1,7 @@
 <template>
-    <div>
         <b-toast ref="toast" :toastClass="toastClass" v-model="toast.show" :title="toast.title" :body="toast.body"
             :variant="toast.variant">
         </b-toast>
-    </div>
 </template>
 
 <script>
@@ -30,22 +28,18 @@ export default {
         }
     },
     computed: {
-        // toast(v){
-        //     console.log("toast", v)
-        //     this.toasting(v)
-        // },
         toaster() {
-            // `this` points to the component instance
             return this.$store.state.core.toaster
         }
     }
 }
 </script>
 
-<style scoped>
+<style>
 .toast {
     position: absolute;
     bottom: 0px;
     left: 200px;
+    z-index: 10
 }
 </style>
