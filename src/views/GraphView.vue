@@ -1,14 +1,15 @@
 <template>
     <div>
+        <!--
         <hr>
         links: {{ links }}
-        <hr>
+        <hr> -->
         <div ref="graph"></div>
         {{ coreCurrent != null && coreCurrent.id }}
-        <hr>
+       <!-- <hr>
         nodes : {{ nodes }}
 
-        {{ ystore.todos }}
+        {{ ystore.todos }} -->
     </div>
 </template>
 
@@ -129,35 +130,30 @@ export default {
             })
 
             todos.forEach(t => {
-                console.log(t)
+               // console.log(t)
                 let source = t.id
-                console.log(source, t.properties)
+               // console.log(source, t.properties)
                 if (t.properties != undefined) {
-                    for (const [label, prop] of Object.entries(t.properties)) {
+                    for (const [name, prop] of Object.entries(t.properties)) {
                         //console.log(`${label}: ${prop.values}`);
                         //console.log ("LINK", source, label, prop.values)
                         prop.values.forEach(v => {
                             if (v.id != undefined) {
-                                console.log("LINK", source, label, v.id)
-                                let link = { source: source, label: label, target: v.id }
-                                links.push(link)
+                              //  console.log("LINK", source, name, v.id)
+                                let targetExist = this.nodes.find(n => n.id == v.id)
+                                if (targetExist) {
+                                    let link = { source: source, name: name, target: v.id }
+                                    links.push(link)
+                                }
                             }
-
                         })
-
                     }
                 }
-
             })
-
-
-            // all_props = all_props.filter(n => n) // remove null elements
-            console.log("all_props concatene", links)
-
-            return []
+           // console.log("links", links)
+            return links
         }
     }
-
 }
 </script>
 
