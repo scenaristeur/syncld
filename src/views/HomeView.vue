@@ -7,12 +7,12 @@
 
     <b-container>
       <b-row class="my-1">
-        <b-col >
+        <b-col>
           <b-form-input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?"
             v-model="newTodo" @keyup.enter="addTodo" />
         </b-col>
 
-        <b-col  @click="privacy = !privacy">
+        <b-col @click="privacy = !privacy">
           <div v-if="privacy">
             <RiLockUnlockLine width="20" height="20" fill="rgba(250,200,0,1)" /> public
           </div>
@@ -116,12 +116,12 @@
                       </b-button>
 
                       <span v-if="clipboard.length > 0">
-                      <b-button @click="paste(null)" variant="outline" title="paste">
-                        <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
-                      </b-button>
-                      <b-button @click="openPaste = true" variant="outline" title="paste">
-                        <RiAttachmentLine width="20" height="20" fill="rgba(0,0,250,1)" />
-                      </b-button>
+                        <b-button @click="paste(null)" variant="outline" title="paste">
+                          <RiAttachment2 width="20" height="20" fill="rgba(0,0,250,1)" />
+                        </b-button>
+                        <b-button @click="openPaste = true" variant="outline" title="paste">
+                          <RiAttachmentLine width="20" height="20" fill="rgba(0,0,250,1)" />
+                        </b-button>
                       </span>
 
                       <b-button @click="link" variant="outline" title="link">
@@ -164,7 +164,7 @@
                       <hr>
                     </b-list-group-item>
 
-               
+
 
 
 
@@ -208,7 +208,7 @@
               </div>
             </b-card>
           </div>
-     
+
           <!-- <b-list-group>
             {{ currentPropertiesSorted }}
             <div class="scroll">
@@ -293,14 +293,14 @@
             </div>
           </b-list-group>
 
-       
+
         </b-col>
-      <b-col>
-        <GraphView />
-      </b-col>
-   
-        
-     
+        <b-col>
+          <GraphView />
+        </b-col>
+
+
+
       </b-row>
 
     </b-container>

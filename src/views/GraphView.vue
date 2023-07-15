@@ -123,13 +123,37 @@ export default {
             return this.ystore.todos.map(t => { return { id: t.id, name: t.name } })
         },
         links() {
-            let todos = this.ystore.todos.map(t => { return t
-               
+            let links = []
+            let todos = this.ystore.todos.map(t => {
+                return JSON.parse(JSON.stringify(t))
             })
 
+            todos.forEach(t => {
+                console.log(t)
+                let source = t.id
+                console.log(source, t.properties)
+                if (t.properties != undefined) {
+                    for (const [label, prop] of Object.entries(t.properties)) {
+                        //console.log(`${label}: ${prop.values}`);
+                        //console.log ("LINK", source, label, prop.values)
+                        prop.values.forEach(v => {
+                            if (v.id != undefined) {
+                                console.log("LINK", source, label, v.id)
+                                let link = { source: source, label: label, target: v.id }
+                                links.push(link)
+                            }
+
+                        })
+
+                    }
+                }
+
+            })
+
+
             // all_props = all_props.filter(n => n) // remove null elements
-            console.log("all_props concatene", todos)
-            console.log(JSON.parse(JSON.stringify(todos)));
+            console.log("all_props concatene", links)
+
             return []
         }
     }
