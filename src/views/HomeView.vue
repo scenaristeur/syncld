@@ -4,23 +4,15 @@
     <b-toast ref="toast" :toastClass="toastClass" v-model="toast.show" :title="toast.title" :body="toast.body"
       :variant="toast.variant">
     </b-toast>
-    <h1>Todo Vue
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24">
-        <path
-          d="M12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2ZM13 12H16L12 8L8 12H11V16H13V12Z">
-        </path>
-      </svg>
-
-    </h1>
 
     <b-container>
       <b-row class="my-1">
-        <b-col sm="10">
+        <b-col >
           <b-form-input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?"
             v-model="newTodo" @keyup.enter="addTodo" />
         </b-col>
 
-        <b-col sm="2" @click="privacy = !privacy">
+        <b-col  @click="privacy = !privacy">
           <div v-if="privacy">
             <RiLockUnlockLine width="20" height="20" fill="rgba(250,200,0,1)" /> public
           </div>
@@ -147,7 +139,7 @@
                     </div>
 
 
-                    <b-list-group-item
+                    <b-list-group-item style="height:100px"
                       v-for="v in Array.from(current.properties[p[0]].values).sort((a, b) => b.lastEdit - a.lastEdit) "
                       :key="v.id">
 
@@ -171,6 +163,8 @@
                       {{ since(v.lastEdit) }}
                       <hr>
                     </b-list-group-item>
+
+               
 
 
 
@@ -214,7 +208,7 @@
               </div>
             </b-card>
           </div>
-
+     
           <!-- <b-list-group>
             {{ currentPropertiesSorted }}
             <div class="scroll">
@@ -298,7 +292,15 @@
               </b-list-group-item>
             </div>
           </b-list-group>
+
+       
         </b-col>
+      <b-col>
+        <GraphView />
+      </b-col>
+   
+        
+     
       </b-row>
 
     </b-container>
@@ -324,6 +326,7 @@ import {
 } from "vue-remix-icons"
 
 import { vBToggle } from 'bootstrap-vue-3';
+import GraphView from '@/views/GraphView.vue'
 
 // make SyncedStore use Vuejs internally
 enableVueBindings(Vue);
@@ -337,7 +340,7 @@ export default {
     RiLockUnlockLine, RiLock2Line, RiClipboardLine,
     RiDeleteBinLine, RiCloseCircleLine, RiAttachmentLine,
     RiAttachment2, RiPencilLine, RiAddCircleFill, RiLink, RiGitBranchLine,
-    RiSave3Fill
+    RiSave3Fill, GraphView
   },
   data() {
     return {

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { context } from "@/context";
 import * as jsonld from "jsonld";
-import { ystore } from "@/y_store";
+import { store as ystore } from "@/y_store";
 //import { enableVueBindings, observeDeep } from "@syncedstore/core";
 //import * as Vue from "vue";
 

@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
-import ystore from './y_store'
+import {store as ystore} from './y_store'
 import store from './store'
 import FusionLd from '@/plugins/FusionLd'
 

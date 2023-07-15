@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { ystore } from "@/y_store";
+import { store as ystore } from "@/y_store";
 import ForceGraph3D from '3d-force-graph';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import * as elementResizeDetectorMaker from "element-resize-detector";
