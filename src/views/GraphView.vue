@@ -36,6 +36,7 @@ export default {
             let graph = this.graph = ForceGraph3D({
                 extraRenderers: [new CSS2DRenderer()]
             })(this.$refs.graph)
+            .width(100) 
                 // .nodeId(['@id'])
                 .nodeLabel('name')
                 //.nodeVal('ve:val')
